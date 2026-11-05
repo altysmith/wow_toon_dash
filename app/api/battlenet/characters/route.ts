@@ -4,6 +4,7 @@ export const dynamic = "force-dynamic";
 
 const regions = ["us", "eu", "kr", "tw"] as const;
 type Region = (typeof regions)[number];
+type LocalizedText = string | Record<string, unknown>;
 
 type CharacterListResponse = {
   wow_accounts?: Array<{
@@ -11,9 +12,9 @@ type CharacterListResponse = {
       id?: number;
       name?: string;
       level?: number;
-      realm?: { name?: string; slug?: string };
-      playable_class?: { name?: string };
-      playable_race?: { name?: string };
+      realm?: { name?: LocalizedText; slug?: string };
+      playable_class?: { name?: LocalizedText };
+      playable_race?: { name?: LocalizedText };
     }>;
   }>;
 };
@@ -64,10 +65,10 @@ export async function GET(request: Request) {
       secondaryName: null,
       level: character.level ?? null,
       region,
-      realm: character.realm?.name ?? null,
+      realm: localizedText(character.realm?.name),
       realmSlug: character.realm?.slug ?? null,
-      characterClass: character.playable_class?.name ?? null,
-      race: character.playable_race?.name ?? null,
+      characterClass: localizedText(character.playable_class?.name),
+      race: localizedText(character.playable_race?.name),
       source: "blizzard-profile-user-wow",
       foreverCompatibility: "unverified",
     }));
@@ -82,4 +83,25 @@ export async function GET(request: Request) {
   } catch {
     return Response.json({ error: "blizzard_profile_request_unreachable" }, { status: 502 });
   }
+}
+
+function localizedText(value: LocalizedText | undefined): string | null {
+  if (typeof value === "string") return value;
+  if (!value) return null;
+  for (const locale of ["en_US", "en_GB", "enUS", "enGB"]) {
+    const localized = value[locale];
+    if (typeof localized === "string") return localized;
+    if (localized && typeof localized === "object") {
+      const nested = localizedText(localized as Record<string, unknown>);
+      if (nested) return nested;
+    }
+  }
+  for (const candidate of Object.values(value)) {
+    if (typeof candidate === "string") return candidate;
+    if (candidate && typeof candidate === "object") {
+      const nested = localizedText(candidate as Record<string, unknown>);
+      if (nested) return nested;
+    }
+  }
+  return null;
 }

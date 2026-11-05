@@ -37,7 +37,9 @@ It is not enabled as a WoW Forever data source. Credentials must not be created 
 - No Blizzard developer credentials are needed for the current Forever-only prototype.
 - Bigcrisp Lolo's Forever region and ruleset have not been confirmed. No Retail realm inference is being carried forward.
 - It is unknown whether Blizzard represents any Forever server, character, primary name, or secondary name.
-- Account-wide discovery is blocked until an authorized Forever source is identified.
+- The account character-list probe successfully returned characters for `profile-us`; that is the standard Americas Retail profile namespace and does not establish Classic or Forever support.
+- Fuzion's public implementation uses `profile-classic1x-us` as its Classic Era namespace example. It is a candidate to probe for Classic Era, not evidence about Forever.
+- Account-wide Forever discovery is blocked until an authorized Forever namespace/source is identified.
 
 ## Forever source investigation
 
