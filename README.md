@@ -32,8 +32,8 @@ npm run build
 - Saves the plan and manual profile in browser local storage.
 - Displays created profiles in an original armory-inspired character sheet with honest empty equipment and appearance states.
 - Provides class and optional class-specific build dropdowns, including a beginner-friendly “Not sure yet” choice.
-- Allows region, realm, ruleset, faction, and playstyle preferences to be edited.
-- Provides a Forever-specific data research screen with manual server identity while an authorized Forever source is being verified.
+- Allows Forever region, ruleset, faction, and playstyle preferences to be edited.
+- Provides a Forever-specific data research screen while an authorized Forever source is being verified.
 - Keeps race, talent, gear, and leveling recommendations locked until suitable Forever sources are verified.
 
 Prototype character data stays in the current browser. No external data is imported until its Forever source and coverage are documented. GitHub is the source of truth for code and planning documents.

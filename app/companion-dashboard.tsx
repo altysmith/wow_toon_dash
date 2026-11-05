@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   createManualProfile,
+  displayRegion,
+  displayRuleset,
   fullCharacterName,
   priorityTotal,
   validatePlan,
@@ -21,7 +23,6 @@ const STORAGE_KEY = "altylab-wow-companion.prototype.v1";
 const starterPlan: CharacterPlan = {
   primaryName: "Bigcrisp",
   secondaryName: "Lolo",
-  realm: "",
   region: "US",
   ruleset: "PvP",
   faction: "Horde",
@@ -38,6 +39,11 @@ const starterPlan: CharacterPlan = {
 const plannedSections = ["Builds & Talents", "Leveling", "Gear", "Professions"];
 const leftEquipmentSlots = ["Head", "Neck", "Shoulders", "Back", "Chest", "Wrists"];
 const rightEquipmentSlots = ["Hands", "Waist", "Legs", "Feet", "Ring", "Weapon"];
+
+function stripLegacyRealm<T extends object>(value: T): Omit<T, "realm"> {
+  const { realm: _legacyRealm, ...current } = value as T & { realm?: unknown };
+  return current as Omit<T, "realm">;
+}
 
 export function CompanionDashboard() {
   const [view, setView] = useState<View>("overview");
@@ -56,9 +62,9 @@ export function CompanionDashboard() {
           savedPlan?: CharacterPlan | null;
           profile?: CharacterProfile | null;
         };
-        if (parsed.plan) setPlan(parsed.plan);
-        if (parsed.savedPlan) setSavedPlan(parsed.savedPlan);
-        if (parsed.profile) setProfile(parsed.profile);
+        if (parsed.plan) setPlan({ ...starterPlan, ...stripLegacyRealm(parsed.plan) });
+        if (parsed.savedPlan) setSavedPlan(stripLegacyRealm(parsed.savedPlan));
+        if (parsed.profile) setProfile(stripLegacyRealm(parsed.profile));
         setNotice("Restored your prototype data from this browser.");
       } catch {
         setNotice("Stored prototype data could not be read, so the starter draft was loaded.");
@@ -227,7 +233,7 @@ function Overview({
       )}
 
       <div className="summary-grid">
-        <SummaryCard label="Identity" value={character ? fullCharacterName(character) : "Not created"} detail={character?.realm || "Realm not set"} />
+        <SummaryCard label="Identity" value={character ? fullCharacterName(character) : "Not created"} detail={character ? `${displayRegion(character.region)} · ${displayRuleset(character.ruleset)}` : "Region and ruleset not set"} />
         <SummaryCard label="Progress" value={profile?.level ? `Level ${profile.level}` : "Unknown level"} detail={profile ? "Manual updates enabled" : "Create a profile to track"} />
         <SummaryCard label="Sync" value="Not connected" detail="Manual entry remains available" tone="warning" />
         <SummaryCard label="Data quality" value="Prototype" detail="No game claims verified yet" tone="warning" />
@@ -243,7 +249,7 @@ function Overview({
             <span className="count-badge">3</span>
           </div>
           <ol className="action-list">
-            <li><span>1</span><div><strong>Confirm realm and region</strong><p>Needed before attempting a character lookup.</p></div></li>
+            <li><span>1</span><div><strong>Confirm region and ruleset</strong><p>Forever uses rulesets with regional mega-server layers.</p></div></li>
             <li><span>2</span><div><strong>Add current level</strong><p>Manual entry prevents the dashboard from guessing.</p></div></li>
             <li><span>3</span><div><strong>Verify Forever data sources</strong><p>Race and build advice stays locked until sourced.</p></div></li>
           </ol>
@@ -293,7 +299,7 @@ function CharacterSheet({ profile, onEdit }: { profile: CharacterProfile; onEdit
         <div className="character-title">
           <p className="eyebrow">Manual character profile</p>
           <h2 id="character-sheet-name">{fullCharacterName(profile)}</h2>
-          <p>{profile.region} · {profile.realm || "Realm unknown"} · {profile.ruleset}</p>
+          <p>{displayRegion(profile.region)} · {displayRuleset(profile.ruleset)} · Realmless mega-server</p>
         </div>
         <div className="character-stats" aria-label="Character summary">
           <span><small>Level</small><strong>{profile.level ?? "—"}</strong></span>
@@ -380,17 +386,22 @@ function Planner({
           <Field label="Secondary name" error={validation.errors.secondaryName}>
             <input value={plan.secondaryName} minLength={2} maxLength={12} onChange={(event) => onUpdate("secondaryName", event.target.value)} />
           </Field>
-          <Field label="Region">
+          <Field label="Region" hint="Forever regional ecosystem">
             <select value={plan.region} onChange={(event) => onUpdate("region", event.target.value as Region)}>
-              <option>US</option><option>EU</option><option>KR</option><option>TW</option>
+              <option value="US">Americas / Oceania</option>
+              <option value="EU">Europe</option>
+              <option value="KR">Korea</option>
+              <option value="TW">Taiwan</option>
             </select>
           </Field>
-          <Field label="Realm / server" hint="Optional for this prototype">
-            <input value={plan.realm} placeholder="Enter when known" onChange={(event) => onUpdate("realm", event.target.value)} />
-          </Field>
-          <Field label="Ruleset">
+          <Field label="Ruleset" hint="Mega-server type">
             <select value={plan.ruleset} onChange={(event) => onUpdate("ruleset", event.target.value as Ruleset)}>
-              <option>PvP</option><option>Normal</option><option>Unknown</option>
+              <option value="Normal">Normal (PvE)</option>
+              <option value="PvP">PvP</option>
+              <option value="RP">Roleplay (RP)</option>
+              <option value="RP-PvP">Roleplay-PvP (RP-PvP)</option>
+              <option value="Hardcore">Hardcore (planned)</option>
+              <option value="Unknown">Not selected</option>
             </select>
           </Field>
           <Field label="Faction">
@@ -450,12 +461,12 @@ function Planner({
           <p className="eyebrow">Live preview</p>
           <h2>{fullCharacterName(plan) || "Unnamed character"}</h2>
           <p>{plan.faction} {plan.characterClass} · {displayBuild(plan.build)}</p>
-          <div className="preview-meta"><span>{plan.region}</span><span>{plan.realm || "Realm unknown"}</span><span>{plan.ruleset}</span></div>
+          <div className="preview-meta"><span>{displayRegion(plan.region)}</span><span>Realmless mega-server</span><span>{displayRuleset(plan.ruleset)}</span></div>
         </section>
         <section className="panel compact-panel">
           <p className="eyebrow">Data boundary</p>
           <h3>No automatic lookup yet</h3>
-          <p>Realm and region are required before we can test a supported character lookup. The profile remains useful with manual updates.</p>
+          <p>Forever character data must come from a verified Forever source. The profile remains useful with manual updates.</p>
         </section>
         <section className="panel compact-panel">
           <p className="eyebrow">Race recommendation</p>
@@ -498,9 +509,9 @@ function BlizzardSync({ plan }: { plan: CharacterPlan }) {
           <p className="eyebrow">Current manual identity</p>
           <h3>{fullCharacterName(plan)}</h3>
           <dl>
-            <div><dt>Server</dt><dd>{plan.realm || "Not entered"}</dd></div>
-            <div><dt>Region</dt><dd>{plan.region}</dd></div>
-            <div><dt>Ruleset</dt><dd>{plan.ruleset}</dd></div>
+            <div><dt>Server model</dt><dd>Realmless</dd></div>
+            <div><dt>Region</dt><dd>{displayRegion(plan.region)}</dd></div>
+            <div><dt>Ruleset</dt><dd>{displayRuleset(plan.ruleset)}</dd></div>
           </dl>
           <p className="result-note">No Retail, Classic, or Worldsoul Armory result will be treated as WoW Forever data.</p>
         </article>
@@ -511,7 +522,7 @@ function BlizzardSync({ plan }: { plan: CharacterPlan }) {
           <p className="eyebrow">Research checklist</p>
           <h3>What must be verified</h3>
           <ol className="setup-steps">
-            <li>Confirm the exact Forever server name and region.</li>
+            <li>Confirm the Forever region and ruleset.</li>
             <li>Find an authorized Forever data source or addon export.</li>
             <li>Verify primary and secondary name fields against Forever behavior.</li>
           </ol>

@@ -1,5 +1,29 @@
 export type Region = "US" | "EU" | "KR" | "TW";
-export type Ruleset = "PvP" | "Normal" | "Unknown";
+export type Ruleset = "PvP" | "Normal" | "RP" | "RP-PvP" | "Hardcore" | "Unknown";
+
+const REGION_LABELS: Record<Region, string> = {
+  US: "Americas / Oceania",
+  EU: "Europe",
+  KR: "Korea",
+  TW: "Taiwan",
+};
+
+const RULESET_LABELS: Record<Ruleset, string> = {
+  Normal: "Normal (PvE)",
+  PvP: "PvP",
+  RP: "Roleplay (RP)",
+  "RP-PvP": "Roleplay-PvP (RP-PvP)",
+  Hardcore: "Hardcore (planned)",
+  Unknown: "Not selected",
+};
+
+export function displayRegion(region: Region) {
+  return REGION_LABELS[region];
+}
+
+export function displayRuleset(ruleset: Ruleset) {
+  return RULESET_LABELS[ruleset];
+}
 
 export type Priorities = {
   soloLeveling: number;
@@ -11,7 +35,6 @@ export type Priorities = {
 export type CharacterPlan = {
   primaryName: string;
   secondaryName: string;
-  realm: string;
   region: Region;
   ruleset: Ruleset;
   faction: "Horde" | "Alliance";
@@ -78,7 +101,6 @@ export function createManualProfile(
     ...plan,
     primaryName: plan.primaryName.trim(),
     secondaryName: plan.secondaryName.trim(),
-    realm: plan.realm.trim(),
     characterClass: plan.characterClass.trim(),
     build: plan.build.trim(),
     id,

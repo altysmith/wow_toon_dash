@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   createManualProfile,
+  displayRegion,
+  displayRuleset,
   fullCharacterName,
   priorityTotal,
   type CharacterPlan,
@@ -10,7 +12,6 @@ import { buildOptionsFor, displayBuild } from "./character-options";
 const plan: CharacterPlan = {
   primaryName: "Bigcrisp",
   secondaryName: "Lolo",
-  realm: "",
   region: "US",
   ruleset: "PvP",
   faction: "Horde",
@@ -24,14 +25,13 @@ describe("character planning", () => {
     expect(fullCharacterName(plan)).toBe("Bigcrisp Lolo");
   });
 
-  it("converts a plan into a manual profile without inventing level or realm", () => {
+  it("converts a plan into a manual profile without inventing level or server", () => {
     const profile = createManualProfile(plan, "profile-1", new Date("2026-11-05T12:00:00Z"));
 
     expect(profile).toMatchObject({
       id: "profile-1",
       primaryName: "Bigcrisp",
       secondaryName: "Lolo",
-      realm: "",
       level: null,
       source: "manual",
     });
@@ -67,5 +67,11 @@ describe("character planning", () => {
     expect(buildOptionsFor("Priest")).toContain("Shadow");
     expect(buildOptionsFor("Mage")).toContain("Frost");
     expect(buildOptionsFor("Unknown class")).toEqual([]);
+  });
+
+  it("labels Forever regions and rulesets", () => {
+    expect(displayRegion("US")).toBe("Americas / Oceania");
+    expect(displayRuleset("RP-PvP")).toBe("Roleplay-PvP (RP-PvP)");
+    expect(displayRuleset("Hardcore")).toBe("Hardcore (planned)");
   });
 });

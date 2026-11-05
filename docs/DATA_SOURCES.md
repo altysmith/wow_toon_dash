@@ -35,13 +35,13 @@ It is not enabled as a WoW Forever data source. Credentials must not be created 
 
 - This cloud environment denied access to `develop.battle.net` under its current network policy, so the current API documentation could not be verified here.
 - No Blizzard developer credentials are needed for the current Forever-only prototype.
-- Bigcrisp Lolo's Forever server has not been confirmed. No Retail realm inference is being carried forward.
+- Bigcrisp Lolo's Forever region and ruleset have not been confirmed. No Retail realm inference is being carried forward.
 - It is unknown whether Blizzard represents any Forever server, character, primary name, or secondary name.
 - Account-wide discovery is blocked until an authorized Forever source is identified.
 
 ## Forever source investigation
 
-The first accepted source must be tied to WoW Forever and document its server list, character identity fields, version coverage, access method, rate limits, and permission to use the data. Candidate sources include a Forever-compatible addon export, a server-provided endpoint, or a community dataset with clear licensing. Until one is confirmed, the dashboard stays manual.
+The first accepted source must be tied to WoW Forever and document its region and ruleset coverage, character identity fields, version coverage, access method, rate limits, and permission to use the data. Candidate sources include a Forever-compatible addon export, a server-provided endpoint, or a community dataset with clear licensing. Until one is confirmed, the dashboard stays manual.
 
 ## Community implementation evidence
 
@@ -52,7 +52,7 @@ The public `cageymage/fuzion` project models Forever characters with required ma
 
 ## Questions still requiring official answers
 
-- Which Forever servers are in scope, and how are they identified?
+- Which Forever regions and rulesets are in scope, and how are they identified?
 - What authorized Forever source exposes character profiles, if any?
 - Does that source return both name parts and the selected ruleset?
 - Can equipment, talents, professions, statistics, level, and experience be queried?

@@ -32,7 +32,7 @@
 - **Status:** Confirmed
 - **Decision:** The first demo includes converting a saved race/build plan into a manually maintained character profile.
 - **Reason:** This joins pre-character planning to ongoing progress tracking without waiting for an external API or addon.
-- **Initial identity fields:** Primary/main character name, secondary character name, realm/server, region, and realm ruleset.
+- **Initial identity fields:** Primary/main character name, secondary character name, region, and ruleset / mega-server type.
 - **Naming evidence:** The owner's first-hand character-creation experience and a current Forever community implementation both describe required two-part names. The community implementation stores `name` and `secondaryName`, displays them together, and validates each as 2–12 characters.
 - **Source quality:** Corroborated community evidence, not yet verified in official Blizzard documentation. See [fuzion PR #46](https://github.com/cageymage/fuzion/pull/46) and its [name migration](https://github.com/cageymage/fuzion/blob/main/backend/migrations/000006_add_character_secondary_name.up.sql).
 - **Integration risk:** That implementation reports Blizzard profile data exposing only one name, which would require manual secondary-name entry or another supported data source.
@@ -94,7 +94,7 @@
 - **Decision:** Verify an authorized WoW Forever data source before adding any live synchronization or account connection.
 - **Reason:** Forever servers and character data may differ from Blizzard Retail, Classic, and Worldsoul services. A familiar Blizzard endpoint is not evidence of Forever compatibility.
 - **Profile boundary:** Imported data remains a preview until its Forever source and field coverage are documented.
-- **Current behavior:** The dashboard stays manual and records the Forever server directly.
+- **Current behavior:** The dashboard stays manual and records Forever region and ruleset; it does not ask for a realm name.
 - **Prohibited assumptions:** Retail realm names, region rules, Armory fields, and standard Blizzard account APIs cannot be used as Forever evidence.
 
 ## Open decisions

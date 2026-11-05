@@ -34,11 +34,10 @@ The initial profile identity will use:
 
 - Primary/main character name
 - Secondary character name
-- Realm/server
 - Region
-- Realm ruleset, selected manually until verified realm metadata is available
+- Ruleset / mega-server type
 
-Unlike earlier versions of World of Warcraft, Forever uses a two-part character name. The dashboard should store the two parts separately and display the complete name in the same order used by the game. Current corroborating community implementation uses `primary/main name + secondary name` and validates each part as 2–12 characters. Phase 0 must confirm the official field labels, limits, uniqueness rules, API representation, and realm relationship before implementation.
+Unlike earlier versions of World of Warcraft, Forever uses a two-part character name and a realmless mega-server model. The dashboard should store the two parts separately and display the complete name in the same order used by the game, with region and ruleset as the location identity. Current corroborating community implementation uses `primary/main name + secondary name`, validates each part as 2–12 characters, and builds an Armory URL without a realm segment. Phase 0 must still confirm the official field labels, limits, uniqueness rules, ruleset availability, API representation, and regional behavior.
 
 This slice tests the central product idea while keeping external synchronization optional.
 
