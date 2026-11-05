@@ -36,6 +36,7 @@ Never use `Tested` because a UI exists or a command was planned.
 5. Keep at most one primary vertical slice in progress unless independent work is explicitly approved.
 6. After implementation, record files changed, checks run, results, limitations, and the next task.
 7. Update the roadmap only when evidence changes scope or sequencing.
+8. Confirm each completed, tested milestone is committed and pushed to GitHub; record the pushed SHA in the handoff.
 
 Ask one focused product question at a time when a decision materially changes the result. Offer a recommendation and explain the cost of the alternatives.
 

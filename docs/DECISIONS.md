@@ -58,6 +58,20 @@
 - **Decision:** Build the Horde Priest race-comparison and saved-plan flow before broader optimizers.
 - **Reason:** It exercises verified game data, preferences, explainability, persistence, and the primary user journey with limited scope.
 
+### D-009 — Browser-persisted working prototype
+
+- **Status:** Confirmed for prototype
+- **Decision:** Build the first working prototype as a local Next.js web app using browser storage before introducing the production database.
+- **Reason:** This makes the complete plan-to-profile interaction testable quickly and keeps unverified integration work out of the critical path.
+- **Limitation:** Character data does not sync across browsers or computers. GitHub synchronizes source code and planning documents only.
+
+### D-010 — Push verified milestones to GitHub
+
+- **Status:** Confirmed
+- **Decision:** Commit and push each coherent milestone after its relevant checks pass.
+- **Reason:** Development will move between computers and needs an up-to-date shared source of truth.
+- **Safety rule:** Fetch before editing, preserve local work, and never force-push over another session.
+
 ## Open decisions
 
 ### Q-001 — Access model for local development

@@ -23,10 +23,10 @@ Complete Phase 0 and prepare an implementation-ready handoff for the first verti
 
 | ID | Task | Status | Depends on | Acceptance evidence |
 | --- | --- | --- | --- | --- |
-| APP-001 | Initialize the Next.js TypeScript application | Not started | PM-002 | Pinned clean install, build, and meaningful smoke test pass |
+| APP-001 | Initialize the Next.js TypeScript application | Tested | D-009 | Pinned install, 5 unit tests, strict typecheck, production build, rendered-page request, and health request pass |
 | APP-002 | Add SQLite/Prisma persistence and migrations | Not started | APP-001, ARC-002 | Fresh migration and persistence checks pass |
-| APP-003 | Build accessible dashboard shell | Not started | APP-001, UX-001 | Desktop and mobile navigation pass agreed accessibility checks |
-| APP-004 | Implement manual character plans and profiles | Not started | APP-002 | Validated CRUD and plan-to-profile conversion pass integration tests |
+| APP-003 | Build accessible dashboard shell | Implemented | APP-001, D-009 | Responsive shell and semantic navigation are implemented; visual and interaction review remains |
+| APP-004 | Implement prototype character plans and profiles | Implemented | APP-001, D-005 | Two-part identity, preferences, browser persistence, validation, and plan-to-profile conversion are implemented; browser E2E remains |
 | DATA-001 | Import verified race/class and racial data | Not started | RES-003, APP-002 | Each record has version and source; fixture validation passes |
 | OPT-001 | Implement deterministic race comparison | Not started | DATA-001, APP-004 | Weighting, eligibility, explanations, and reproducibility tests pass |
 | E2E-001 | Verify the primary Priest scenario | Not started | OPT-001 | End-to-end flow completes with sourced data and saved plan |
