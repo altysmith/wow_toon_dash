@@ -26,6 +26,7 @@ npm run build
 - Starts with a draft for `Bigcrisp Lolo`.
 - Stores Forever's primary and secondary names separately.
 - Saves the plan and manual profile in browser local storage.
+- Displays created profiles in an original armory-inspired character sheet with honest empty equipment and appearance states.
 - Provides class and optional class-specific build dropdowns, including a beginner-friendly “Not sure yet” choice.
 - Allows region, realm, ruleset, faction, and playstyle preferences to be edited.
 - Keeps race, talent, gear, and leveling recommendations locked until suitable Forever sources are verified.

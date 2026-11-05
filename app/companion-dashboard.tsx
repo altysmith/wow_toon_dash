@@ -36,6 +36,8 @@ const starterPlan: CharacterPlan = {
 };
 
 const plannedSections = ["Builds & Talents", "Leveling", "Gear", "Professions", "Data Sources"];
+const leftEquipmentSlots = ["Head", "Neck", "Shoulders", "Back", "Chest", "Wrists"];
+const rightEquipmentSlots = ["Hands", "Waist", "Legs", "Feet", "Ring", "Weapon"];
 
 export function CompanionDashboard() {
   const [view, setView] = useState<View>("overview");
@@ -200,20 +202,24 @@ function Overview({
 
   return (
     <div className="content-stack">
-      <section className="hero-card">
-        <div>
-          <p className="eyebrow">{profile ? "Manual character profile" : savedPlan ? "Saved character plan" : "Start here"}</p>
-          <h2>{character ? fullCharacterName(character) : "Plan your first character"}</h2>
-          <p className="hero-copy">
-            {character
-              ? `${character.faction} ${character.characterClass} · ${displayBuild(character.build)} · ${character.ruleset}`
-              : "Choose your character identity and priorities, then turn the plan into a trackable profile."}
-          </p>
-        </div>
-        <button className="primary-button" onClick={onPlan}>
-          {character ? "Edit character plan" : "Create character plan"}
-        </button>
-      </section>
+      {profile ? (
+        <CharacterSheet profile={profile} onEdit={onPlan} />
+      ) : (
+        <section className="hero-card">
+          <div>
+            <p className="eyebrow">{savedPlan ? "Saved character plan" : "Start here"}</p>
+            <h2>{character ? fullCharacterName(character) : "Plan your first character"}</h2>
+            <p className="hero-copy">
+              {character
+                ? `${character.faction} ${character.characterClass} · ${displayBuild(character.build)} · ${character.ruleset}`
+                : "Choose your character identity and priorities, then turn the plan into a trackable profile."}
+            </p>
+          </div>
+          <button className="primary-button" onClick={onPlan}>
+            {character ? "Edit character plan" : "Create character plan"}
+          </button>
+        </section>
+      )}
 
       <div className="summary-grid">
         <SummaryCard label="Identity" value={character ? fullCharacterName(character) : "Not created"} detail={character?.realm || "Realm not set"} />
@@ -267,6 +273,63 @@ function Overview({
         </section>
       </div>
     </div>
+  );
+}
+
+function CharacterSheet({ profile, onEdit }: { profile: CharacterProfile; onEdit: () => void }) {
+  const initials = `${profile.primaryName.charAt(0)}${profile.secondaryName.charAt(0)}`.toUpperCase();
+
+  return (
+    <section className="character-sheet" aria-labelledby="character-sheet-name">
+      <div className="character-sheet-header">
+        <span className={`faction-crest ${profile.faction.toLowerCase()}`} aria-hidden="true">
+          {profile.faction === "Horde" ? "H" : "A"}
+        </span>
+        <div className="character-title">
+          <p className="eyebrow">Manual character profile</p>
+          <h2 id="character-sheet-name">{fullCharacterName(profile)}</h2>
+          <p>{profile.region} · {profile.realm || "Realm unknown"} · {profile.ruleset}</p>
+        </div>
+        <div className="character-stats" aria-label="Character summary">
+          <span><small>Level</small><strong>{profile.level ?? "—"}</strong></span>
+          <span><small>Class</small><strong>{profile.characterClass}</strong></span>
+          <span><small>Focus</small><strong>{displayBuild(profile.build)}</strong></span>
+        </div>
+        <button className="sheet-edit-button" onClick={onEdit}>Edit profile</button>
+      </div>
+
+      <div className="sheet-tabs" role="tablist" aria-label="Character sections">
+        <button className="active" role="tab" aria-selected="true">Character</button>
+        <button role="tab" aria-selected="false" disabled>Talents <small>Planned</small></button>
+        <button role="tab" aria-selected="false" disabled>Progress <small>Planned</small></button>
+        <button role="tab" aria-selected="false" disabled>History <small>Planned</small></button>
+      </div>
+
+      <div className="character-stage">
+        <EquipmentColumn slots={leftEquipmentSlots} side="left" />
+        <div className="character-figure">
+          <div className="figure-glow" aria-hidden="true" />
+          <div className="figure-medallion" aria-hidden="true">{initials}</div>
+          <strong>Character appearance unavailable</strong>
+          <p>A future supported import can place character art or a model here.</p>
+          <span className="manual-data-badge">Manual data</span>
+        </div>
+        <EquipmentColumn slots={rightEquipmentSlots} side="right" />
+      </div>
+    </section>
+  );
+}
+
+function EquipmentColumn({ slots, side }: { slots: string[]; side: "left" | "right" }) {
+  return (
+    <ul className={`equipment-column ${side}`} aria-label={`${side} equipment slots`}>
+      {slots.map((slot) => (
+        <li key={slot}>
+          <span className="empty-slot" aria-hidden="true">—</span>
+          <div><strong>{slot}</strong><small>No item recorded</small></div>
+        </li>
+      ))}
+    </ul>
   );
 }
 

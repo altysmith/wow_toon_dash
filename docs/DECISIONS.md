@@ -80,6 +80,14 @@
 - **Prototype behavior:** Class and build use dropdowns; changing class clears an incompatible build.
 - **Data note:** Prototype class and talent labels remain excluded from recommendations until Forever availability and terminology are verified.
 
+### D-012 — Armory-inspired character display
+
+- **Status:** Confirmed
+- **Decision:** Present an active character as a central character sheet with identity and level above, equipment slots arranged on both sides, and compact character-section tabs.
+- **Reason:** This layout makes the character feel like the center of the product and lets players scan identity, gear completeness, and progress quickly.
+- **Design boundary:** Use original AltyLab styling and honest empty states. Do not copy Blizzard artwork, logos, item art, or character renders.
+- **Prototype behavior:** Unknown equipment remains visibly empty, and unavailable character art uses a labeled placeholder rather than fabricated imagery.
+
 ## Open decisions
 
 ### Q-001 — Access model for local development
