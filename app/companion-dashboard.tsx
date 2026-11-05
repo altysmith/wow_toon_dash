@@ -183,7 +183,7 @@ export function CompanionDashboard() {
         <div className="notice" role="status">{notice}</div>
 
         {view === "overview" ? (
-          <Overview profile={profile} savedPlan={savedPlan} onPlan={() => setView("planner")} onLevel={updateLevel} />
+          <Overview profile={profile} savedPlan={savedPlan} onPlan={() => setView("planner")} onLevel={updateLevel} onSync={() => setView("sync")} />
         ) : view === "planner" ? (
           <Planner
             plan={plan}
@@ -212,11 +212,13 @@ function Overview({
   savedPlan,
   onPlan,
   onLevel,
+  onSync,
 }: {
   profile: CharacterProfile | null;
   savedPlan: CharacterPlan | null;
   onPlan: () => void;
   onLevel: (level: number | null) => void;
+  onSync: () => void;
 }) {
   const character = profile ?? savedPlan;
 
@@ -244,7 +246,7 @@ function Overview({
       <div className="summary-grid">
         <SummaryCard label="Identity" value={character ? fullCharacterName(character) : "Not created"} detail={character ? `${displayRegion(character.region)} · ${displayRuleset(character.ruleset)}` : "Region and ruleset not set"} />
         <SummaryCard label="Progress" value={profile?.level ? `Level ${profile.level}` : "Unknown level"} detail={profile ? "Manual updates enabled" : "Create a profile to track"} />
-        <SummaryCard label="Sync" value="Not connected" detail="Manual entry remains available" tone="warning" />
+        <BattleNetSummary onManage={onSync} />
         <SummaryCard label="Data quality" value="Prototype" detail="No game claims verified yet" tone="warning" />
       </div>
 
@@ -358,6 +360,35 @@ function SummaryCard({ label, value, detail, tone }: { label: string; value: str
     <section className="summary-card">
       <span className={tone === "warning" ? "card-icon warning" : "card-icon"} aria-hidden="true">{tone === "warning" ? "!" : "✦"}</span>
       <div><p>{label}</p><strong>{value}</strong><small>{detail}</small></div>
+    </section>
+  );
+}
+
+function BattleNetSummary({ onManage }: { onManage: () => void }) {
+  const [status, setStatus] = useState<BattleNetStatus | null>(null);
+
+  useEffect(() => {
+    fetch("/api/battlenet/status")
+      .then((response) => response.json() as Promise<BattleNetStatus>)
+      .then(setStatus)
+      .catch(() => setStatus({ configured: false, account: null, foreverCharacterDiscovery: "unverified" }));
+  }, []);
+
+  const connected = Boolean(status?.account);
+  const value = !status ? "Checking…" : connected ? "Connected" : "Not connected";
+  const detail = connected
+    ? status?.account?.battleTag ?? "Battle.net account linked"
+    : status?.configured ? "Connect your Battle.net account" : "OAuth setup needed";
+
+  return (
+    <section className="summary-card battlenet-summary">
+      <span className={connected ? "card-icon" : "card-icon warning"} aria-hidden="true">{connected ? "✓" : "!"}</span>
+      <div><p>Battle.net</p><strong>{value}</strong><small>{detail}</small></div>
+      {connected ? (
+        <button className="summary-action" onClick={onManage}>Character probe</button>
+      ) : (
+        <a className="summary-action" href="/api/battlenet/connect">Connect Battle.net</a>
+      )}
     </section>
   );
 }
