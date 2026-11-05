@@ -299,7 +299,7 @@ function CharacterSheet({ profile, onEdit }: { profile: CharacterProfile; onEdit
         <div className="character-title">
           <p className="eyebrow">Manual character profile</p>
           <h2 id="character-sheet-name">{fullCharacterName(profile)}</h2>
-          <p>{displayRegion(profile.region)} · {displayRuleset(profile.ruleset)} · Realmless mega-server</p>
+          <p>{displayRegion(profile.region)} · {displayRuleset(profile.ruleset)}</p>
         </div>
         <div className="character-stats" aria-label="Character summary">
           <span><small>Level</small><strong>{profile.level ?? "—"}</strong></span>
@@ -461,7 +461,7 @@ function Planner({
           <p className="eyebrow">Live preview</p>
           <h2>{fullCharacterName(plan) || "Unnamed character"}</h2>
           <p>{plan.faction} {plan.characterClass} · {displayBuild(plan.build)}</p>
-          <div className="preview-meta"><span>{displayRegion(plan.region)}</span><span>Realmless mega-server</span><span>{displayRuleset(plan.ruleset)}</span></div>
+          <div className="preview-meta"><span>{displayRegion(plan.region)}</span><span>{displayRuleset(plan.ruleset)}</span></div>
         </section>
         <section className="panel compact-panel">
           <p className="eyebrow">Data boundary</p>
