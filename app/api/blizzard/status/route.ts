@@ -6,7 +6,8 @@ export function GET() {
   const status = getBlizzardConfigurationStatus();
   return Response.json({
     ...status,
-    mode: "public-character-lookup",
+    mode: "comparison-only",
+    scope: "wow-forever",
     foreverCompatibility: "unverified",
   });
 }

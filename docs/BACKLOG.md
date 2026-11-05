@@ -27,8 +27,8 @@ Complete Phase 0 and prepare an implementation-ready handoff for the first verti
 | APP-002 | Add SQLite/Prisma persistence and migrations | Not started | APP-001, ARC-002 | Fresh migration and persistence checks pass |
 | APP-003 | Build accessible dashboard shell | Implemented | APP-001, D-009 | Responsive shell and semantic navigation are implemented; visual and interaction review remains |
 | APP-004 | Implement prototype character plans and profiles | Implemented | APP-001, D-005 | Two-part identity, preferences, browser persistence, validation, and plan-to-profile conversion are implemented; browser E2E remains |
-| SYNC-001 | Add credential-safe Blizzard character lookup spike | Implemented | APP-001, D-013 | Server-only client credentials, safe status and lookup routes, normalized preview, and adapter tests are implemented |
-| SYNC-002 | Verify Bigcrisp Lolo against the live Blizzard API | Blocked | SYNC-001, RES-001 | Owner confirms region and realm; local or cloud credentials return the intended character without exposing secrets |
+| SYNC-001 | Keep the Blizzard adapter isolated as comparison code | Implemented | APP-001, D-013 | Adapter tests pass, but the UI does not treat Blizzard Retail data as WoW Forever data |
+| SYNC-002 | Identify an authorized WoW Forever character source | Blocked | RES-001, RES-002, D-013 | Source documents server identity, two-part names, field coverage, access rules, and licensing |
 | DATA-001 | Import verified race/class and racial data | Not started | RES-003, APP-002 | Each record has version and source; fixture validation passes |
 | OPT-001 | Implement deterministic race comparison | Not started | DATA-001, APP-004 | Weighting, eligibility, explanations, and reproducibility tests pass |
 | E2E-001 | Verify the primary Priest scenario | Not started | OPT-001 | End-to-end flow completes with sourced data and saved plan |
@@ -44,7 +44,7 @@ Complete Phase 0 and prepare an implementation-ready handoff for the first verti
 
 ## Current blockers and unknowns
 
-- Official Forever API coverage has not been verified, including whether it exposes both name parts.
+- No authorized WoW Forever API, addon export, or server dataset has been verified, including whether it exposes both name parts.
 - Race/class examples and racial effects from the source prompt are requirements to verify, not seed data.
 - Community dataset licensing and access rules are unknown.
 - No authorized real character data or game-client environment is available.

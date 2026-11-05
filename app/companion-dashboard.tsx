@@ -13,7 +13,6 @@ import {
   type Ruleset,
 } from "../lib/character";
 import { CHARACTER_CLASSES, buildOptionsFor, displayBuild } from "../lib/character-options";
-import type { BlizzardCharacterSummary, BlizzardRegion } from "../lib/blizzard";
 
 type View = "overview" | "planner" | "sync";
 
@@ -141,7 +140,7 @@ export function CompanionDashboard() {
             <span aria-hidden="true">✦</span> Character Planner
           </button>
           <button className={view === "sync" ? "nav-item active" : "nav-item"} onClick={() => setView("sync")}>
-            <span aria-hidden="true">↻</span> Data Sources / Sync
+            <span aria-hidden="true">↻</span> Forever Data Research
           </button>
           {plannedSections.map((section) => (
             <button className="nav-item planned" disabled key={section}>
@@ -161,7 +160,7 @@ export function CompanionDashboard() {
         <header className="topbar">
           <div>
             <p className="eyebrow">World of Warcraft: Forever</p>
-            <h1>{view === "overview" ? "Character overview" : view === "planner" ? "Character planner" : "Data sources and sync"}</h1>
+            <h1>{view === "overview" ? "Character overview" : view === "planner" ? "Character planner" : "Forever data research"}</h1>
           </div>
           <div className="prototype-badge">Prototype · Unverified game data</div>
         </header>
@@ -487,116 +486,41 @@ function Priority({ label, value, onChange }: { label: string; value: number; on
   );
 }
 
-type BlizzardStatus = {
-  configured: boolean;
-  region: BlizzardRegion;
-  locale: string;
-};
-
 function BlizzardSync({ plan }: { plan: CharacterPlan }) {
-  const initialRegion = plan.region.toLowerCase();
-  const [region, setRegion] = useState<BlizzardRegion>(
-    initialRegion === "eu" || initialRegion === "kr" || initialRegion === "tw" ? initialRegion : "us",
-  );
-  const [realm, setRealm] = useState(plan.realm);
-  const [primaryName, setPrimaryName] = useState(plan.primaryName);
-  const [status, setStatus] = useState<BlizzardStatus | null>(null);
-  const [result, setResult] = useState<BlizzardCharacterSummary | null>(null);
-  const [message, setMessage] = useState("Checking whether the Blizzard API is configured…");
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-    fetch("/api/blizzard/status")
-      .then(async (response) => {
-        const body = (await response.json()) as BlizzardStatus;
-        if (active) {
-          setStatus(body);
-          setMessage(body.configured ? "Blizzard API credentials are available on this server." : "Add Blizzard API credentials to enable lookup.");
-        }
-      })
-      .catch(() => active && setMessage("Could not check the Blizzard API configuration."));
-    return () => { active = false; };
-  }, []);
-
-  async function lookup(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setLoading(true);
-    setResult(null);
-    setMessage("Looking up the character…");
-    try {
-      const query = new URLSearchParams({ region, realm, name: primaryName });
-      const response = await fetch(`/api/blizzard/character?${query}`);
-      const body = (await response.json()) as { character?: BlizzardCharacterSummary; error?: string; message?: string };
-      if (!response.ok || !body.character) throw new Error(body.message || body.error || "Character lookup failed.");
-      setResult(body.character);
-      setMessage("Character found. Review the Blizzard data below before using it in a profile.");
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Character lookup failed.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
   return (
     <div className="sync-layout">
       <section className="panel sync-intro">
-        <p className="eyebrow">First integration slice</p>
-        <h2>Look up one public character</h2>
-        <p>This tests Blizzard&apos;s official character profile API with a region, realm, and primary character name. It does not ask for your Battle.net password or browser cookies.</p>
-        <div className={status?.configured ? "sync-state" : "sync-state sync-warning"}>{message}</div>
-
-        <form className="sync-form" onSubmit={lookup}>
-          <Field label="Region">
-            <select value={region} onChange={(event) => setRegion(event.target.value as BlizzardRegion)}>
-              <option value="us">Americas (US)</option>
-              <option value="eu">Europe (EU)</option>
-              <option value="kr">Korea (KR)</option>
-              <option value="tw">Taiwan (TW)</option>
-            </select>
-          </Field>
-          <Field label="Realm">
-            <input value={realm} onChange={(event) => setRealm(event.target.value)} placeholder="Blackrock" required />
-          </Field>
-          <Field label="Primary character name" hint="Blizzard lookup key">
-            <input value={primaryName} onChange={(event) => setPrimaryName(event.target.value)} placeholder="Bigcrisp" required />
-          </Field>
-          <button className="primary-button" disabled={loading || !status?.configured} type="submit">
-            {loading ? "Looking up…" : "Look up character"}
-          </button>
-        </form>
-
-        {result && (
-          <article className="sync-result">
-            <p className="eyebrow">Official Blizzard profile response</p>
-            <h3>{result.primaryName} <span>{result.secondaryName ?? "Secondary name not returned"}</span></h3>
-            <dl>
-              <div><dt>Realm</dt><dd>{result.realm}</dd></div>
-              <div><dt>Level</dt><dd>{result.level ?? "Unknown"}</dd></div>
-              <div><dt>Race</dt><dd>{result.race ?? "Unknown"}</dd></div>
-              <div><dt>Class</dt><dd>{result.characterClass ?? "Unknown"}</dd></div>
-              <div><dt>Active spec</dt><dd>{result.activeSpec ?? "Unknown"}</dd></div>
-            </dl>
-            <p className="result-note">Forever compatibility is unverified. This preview does not overwrite your manual profile.</p>
-          </article>
-        )}
+        <p className="eyebrow">WoW Forever only</p>
+        <h2>Server data research</h2>
+        <p>This dashboard is scoped to World of Warcraft: Forever. Its servers, naming rules, game data, and available integrations must be researched as Forever-specific sources.</p>
+        <div className="sync-state sync-warning">Live lookup is paused until a Forever-compatible API, addon export, or server data source is verified.</div>
+        <article className="sync-result">
+          <p className="eyebrow">Current manual identity</p>
+          <h3>{fullCharacterName(plan)}</h3>
+          <dl>
+            <div><dt>Server</dt><dd>{plan.realm || "Not entered"}</dd></div>
+            <div><dt>Region</dt><dd>{plan.region}</dd></div>
+            <div><dt>Ruleset</dt><dd>{plan.ruleset}</dd></div>
+          </dl>
+          <p className="result-note">No Retail, Classic, or Worldsoul Armory result will be treated as WoW Forever data.</p>
+        </article>
       </section>
 
       <aside className="sync-side">
         <section className="panel compact-panel">
-          <p className="eyebrow">Setup</p>
-          <h3>Developer credentials stay private</h3>
+          <p className="eyebrow">Research checklist</p>
+          <h3>What must be verified</h3>
           <ol className="setup-steps">
-            <li>Create an application at develop.battle.net.</li>
-            <li>Copy <code>.env.example</code> to <code>.env.local</code>.</li>
-            <li>Add the client ID and secret locally, then restart the app.</li>
+            <li>Confirm the exact Forever server name and region.</li>
+            <li>Find an authorized Forever data source or addon export.</li>
+            <li>Verify primary and secondary name fields against Forever behavior.</li>
           </ol>
-          <p>Never paste the client secret into chat or commit it to GitHub.</p>
+          <p>Manual entry remains available while this research is incomplete.</p>
         </section>
         <section className="panel compact-panel">
-          <p className="eyebrow">Next slice</p>
-          <h3>Account connection</h3>
-          <p>After this public lookup works, Battle.net OAuth can discover characters tied to an authorized account where Blizzard supports it.</p>
+          <p className="eyebrow">Scope rule</p>
+          <h3>Forever sources only</h3>
+          <p>Any future sync adapter must name its Forever source and document its coverage before it can update a character profile.</p>
         </section>
       </aside>
     </div>

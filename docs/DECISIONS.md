@@ -88,14 +88,14 @@
 - **Design boundary:** Use original AltyLab styling and honest empty states. Do not copy Blizzard artwork, logos, item art, or character renders.
 - **Prototype behavior:** Unknown equipment remains visibly empty, and unavailable character art uses a labeled placeholder rather than fabricated imagery.
 
-### D-013 — Validate public lookup before account OAuth
+### D-013 — Verify a WoW Forever source before any sync
 
 - **Status:** Confirmed for prototype
-- **Decision:** Prove an official Blizzard public character lookup using region, realm, and primary character name before adding Battle.net account authorization.
-- **Reason:** This validates credentials, endpoint behavior, and Forever coverage with a smaller security boundary.
-- **Credential boundary:** The client secret is read only by server routes from environment variables. The browser receives normalized character fields and safe errors, never the secret or access token.
-- **Profile boundary:** Lookup results remain a preview and do not overwrite the manually maintained profile.
-- **Prohibited inputs:** The app must never request a Battle.net password or browser cookies.
+- **Decision:** Verify an authorized WoW Forever data source before adding any live synchronization or account connection.
+- **Reason:** Forever servers and character data may differ from Blizzard Retail, Classic, and Worldsoul services. A familiar Blizzard endpoint is not evidence of Forever compatibility.
+- **Profile boundary:** Imported data remains a preview until its Forever source and field coverage are documented.
+- **Current behavior:** The dashboard stays manual and records the Forever server directly.
+- **Prohibited assumptions:** Retail realm names, region rules, Armory fields, and standard Blizzard account APIs cannot be used as Forever evidence.
 
 ## Open decisions
 
