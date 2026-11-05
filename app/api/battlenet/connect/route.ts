@@ -15,9 +15,9 @@ export function GET(request: Request) {
   authorize.searchParams.set("response_type", "code");
   authorize.searchParams.set("scope", "wow.profile");
   authorize.searchParams.set("state", state);
-  const response = Response.redirect(authorize);
-  response.headers.append("Set-Cookie", stateCookie(state));
-  return response;
+  const headers = new Headers({ Location: authorize.toString() });
+  headers.append("Set-Cookie", stateCookie(state));
+  return new Response(null, { status: 302, headers });
 }
 
 function isAllowedRedirectUri(value: string) {
