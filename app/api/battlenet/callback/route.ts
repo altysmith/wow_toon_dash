@@ -50,16 +50,15 @@ export async function GET(request: Request) {
       battleTag: typeof user.battletag === "string" ? user.battletag : null,
       connectedAt: new Date().toISOString(),
     };
-    const response = finish(request, "connected");
-    response.headers.append("Set-Cookie", sessionCookie(account, config.sessionSecret));
-    return response;
+    return finish(request, "connected", sessionCookie(account, config.sessionSecret));
   } catch {
     return finish(request, "failed");
   }
 }
 
-function finish(request: Request, result: string) {
-  const response = Response.redirect(new URL(`/?view=sync&bnet=${result}`, request.url));
-  response.headers.append("Set-Cookie", clearStateCookie());
-  return response;
+function finish(request: Request, result: string, accountCookie?: string) {
+  const headers = new Headers({ Location: new URL(`/?view=sync&bnet=${result}`, request.url).toString() });
+  headers.append("Set-Cookie", clearStateCookie());
+  if (accountCookie) headers.append("Set-Cookie", accountCookie);
+  return new Response(null, { status: 303, headers });
 }
