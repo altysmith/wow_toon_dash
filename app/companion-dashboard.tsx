@@ -601,9 +601,18 @@ type CharacterProbeResult = {
   }>;
 };
 
+type GameProfile = "" | "retail" | "classic-era" | "forever";
+
+function namespaceFor(profile: GameProfile, region: string) {
+  if (profile === "retail") return `profile-${region}`;
+  if (profile === "classic-era" && region === "us") return "profile-classic1x-us";
+  return "";
+}
+
 function BattleNetConnection({ region: initialRegion }: { region: string }) {
   const [status, setStatus] = useState<BattleNetStatus | null>(null);
   const [region, setRegion] = useState(initialRegion);
+  const [gameProfile, setGameProfile] = useState<GameProfile>("");
   const [namespace, setNamespace] = useState("");
   const [probe, setProbe] = useState<CharacterProbeResult | null>(null);
   const [probing, setProbing] = useState(false);
@@ -651,18 +660,40 @@ function BattleNetConnection({ region: initialRegion }: { region: string }) {
       <p className="result-note">The account connection is confirmed. Character discovery is experimental until a WoW Forever namespace is verified.</p>
       <form className="namespace-probe" onSubmit={probeNamespace}>
         <p className="eyebrow">Try an explicit namespace</p>
-        <p>Enter a candidate from a Forever-specific source. We will query Blizzard&apos;s account character list and show a preview only. A 404 cannot tell us whether the namespace is wrong or the account has no characters there.</p>
+        <p>Choose a game version to fill in its namespace, then preview the matching account character list. Retail and Classic Era results are not Forever data. Forever&apos;s namespace is still unknown, so select it only when you have a sourced candidate.</p>
         <div className="namespace-fields">
+          <Field label="Game version">
+            <select value={gameProfile} onChange={(event) => {
+              const nextProfile = event.target.value as GameProfile;
+              setGameProfile(nextProfile);
+              setNamespace(namespaceFor(nextProfile, region));
+              setProbe(null);
+              setProbeMessage("");
+            }}>
+              <option value="">Choose a game version</option>
+              <option value="retail">World of Warcraft (Retail)</option>
+              <option value="classic-era">WoW Classic Era</option>
+              <option value="forever">WoW Forever (namespace unknown)</option>
+            </select>
+          </Field>
           <Field label="Region">
-            <select value={region} onChange={(event) => setRegion(event.target.value)}>
+            <select value={region} onChange={(event) => {
+              const nextRegion = event.target.value;
+              setRegion(nextRegion);
+              setNamespace(namespaceFor(gameProfile, nextRegion));
+              setProbe(null);
+              setProbeMessage("");
+            }}>
               <option value="us">Americas / Oceania</option><option value="eu">Europe</option><option value="kr">Korea</option><option value="tw">Taiwan</option>
             </select>
           </Field>
-          <Field label="Namespace" hint="No default is assumed">
-            <input required value={namespace} onChange={(event) => setNamespace(event.target.value)} placeholder="Enter a sourced candidate" />
+          <Field label="Namespace" hint={namespace ? "Filled from game version and region" : gameProfile ? "Enter a sourced candidate" : "Choose a game version first"}>
+            <input required readOnly={Boolean(namespace)} value={namespace} onChange={(event) => setNamespace(event.target.value)} placeholder={gameProfile === "forever" ? "Enter Forever-specific candidate" : gameProfile ? "Enter sourced candidate" : "Select a game version"} />
           </Field>
           <button className="primary-button" disabled={probing || !namespace.trim()} type="submit">{probing ? "Checking…" : "Check namespace"}</button>
         </div>
+        {gameProfile === "forever" && <p className="namespace-note">We do not have a verified WoW Forever namespace. Enter one only if you have a Forever-specific source; Blizzard results remain a preview until compatibility is established.</p>}
+        {gameProfile === "classic-era" && region !== "us" && <p className="namespace-note">The public Classic Era namespace example we found is for the US region. Enter a sourced candidate for this region; its format is unverified.</p>}
         {probeMessage && <div className="sync-state sync-warning" role="status">{probeMessage}</div>}
       </form>
       {probe?.characters && probe.characters.length > 0 && (

@@ -170,8 +170,10 @@ main { width: 100%; max-width: 1500px; padding: 30px clamp(20px, 4vw, 64px) 24px
 .bnet-connect form { margin: 0; }
 .namespace-probe { width: 100%; margin: 14px 0; padding-top: 16px; border-top: 1px solid var(--line); }
 .namespace-probe > p:not(.eyebrow) { color: var(--muted); font-size: 13px; line-height: 1.5; }
-.namespace-fields { display: grid; grid-template-columns: .8fr 1.2fr auto; align-items: end; gap: 12px; }
+.namespace-fields { display: grid; grid-template-columns: 1.2fr .8fr 1.2fr auto; align-items: end; gap: 12px; }
 .namespace-fields .primary-button { white-space: nowrap; }
+.namespace-fields input[readonly] { color: var(--muted); background: #0b0c11; }
+.namespace-note { color: var(--warning); font-size: 12px; line-height: 1.5; }
 
 @media (max-width: 1100px) {
   .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
