@@ -24,7 +24,7 @@ The first likely character is a Horde Shadow Priest on a PvP ruleset. A Mage is 
 
 The proposed first slice lets a user:
 
-1. Select Forever, Horde, PvP, Priest, Shadow, and a balance of solo leveling, world PvP, damage, and survivability.
+1. Select Forever, faction, ruleset, and class, with build/talent focus remaining optional for players who are still learning.
 2. View only verified eligible races and sourced racial abilities.
 3. Adjust preference weights and see an explainable comparison.
 4. Save the result as a planned character.
@@ -86,7 +86,7 @@ These are product goals, but each requires a verified data source or a clearly l
 - Every displayed game fact has a source and game-data version.
 - Weight changes produce reproducible, explainable ranking changes.
 - A plan persists and can later become a character profile.
-- Converting a plan preserves its two-part name, class, race, build intent, play priorities, and ruleset selection.
+- Converting a plan preserves its two-part name, class, optional build intent, play priorities, and ruleset selection.
 - Missing or uncertain data is visible rather than silently inferred.
 - The application builds, starts, and passes its agreed tests on the development environment.
 

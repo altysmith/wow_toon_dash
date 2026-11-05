@@ -12,6 +12,7 @@ import {
   type Region,
   type Ruleset,
 } from "../lib/character";
+import { CHARACTER_CLASSES, buildOptionsFor, displayBuild } from "../lib/character-options";
 
 type View = "overview" | "planner";
 
@@ -25,7 +26,7 @@ const starterPlan: CharacterPlan = {
   ruleset: "PvP",
   faction: "Horde",
   characterClass: "Priest",
-  build: "Shadow",
+  build: "",
   priorities: {
     soloLeveling: 30,
     worldPvp: 30,
@@ -205,7 +206,7 @@ function Overview({
           <h2>{character ? fullCharacterName(character) : "Plan your first character"}</h2>
           <p className="hero-copy">
             {character
-              ? `${character.faction} ${character.characterClass} · ${character.build} · ${character.ruleset}`
+              ? `${character.faction} ${character.characterClass} · ${displayBuild(character.build)} · ${character.ruleset}`
               : "Choose your character identity and priorities, then turn the plan into a trackable profile."}
           </p>
         </div>
@@ -329,11 +330,28 @@ function Planner({
               <option>Horde</option><option>Alliance</option>
             </select>
           </Field>
-          <Field label="Class" error={validation.errors.characterClass}>
-            <input value={plan.characterClass} onChange={(event) => onUpdate("characterClass", event.target.value)} />
+          <Field label="Class" hint="Prototype list; verification pending" error={validation.errors.characterClass}>
+            <select
+              value={plan.characterClass}
+              onChange={(event) => {
+                const nextClass = event.target.value;
+                onUpdate("characterClass", nextClass);
+                if (!buildOptionsFor(nextClass).includes(plan.build)) onUpdate("build", "");
+              }}
+            >
+              <option value="" disabled>Choose a class</option>
+              {CHARACTER_CLASSES.map((characterClass) => <option key={characterClass}>{characterClass}</option>)}
+            </select>
           </Field>
-          <Field label="Build / talent focus" error={validation.errors.build}>
-            <input value={plan.build} onChange={(event) => onUpdate("build", event.target.value)} />
+          <Field label="Build / talent focus" hint="Optional">
+            <select
+              value={plan.build}
+              disabled={!plan.characterClass}
+              onChange={(event) => onUpdate("build", event.target.value)}
+            >
+              <option value="">Not sure yet</option>
+              {buildOptionsFor(plan.characterClass).map((build) => <option key={build}>{build}</option>)}
+            </select>
           </Field>
         </div>
 
@@ -363,7 +381,7 @@ function Planner({
           <span className="preview-rune" aria-hidden="true">✦</span>
           <p className="eyebrow">Live preview</p>
           <h2>{fullCharacterName(plan) || "Unnamed character"}</h2>
-          <p>{plan.faction} {plan.characterClass} · {plan.build}</p>
+          <p>{plan.faction} {plan.characterClass} · {displayBuild(plan.build)}</p>
           <div className="preview-meta"><span>{plan.region}</span><span>{plan.realm || "Realm unknown"}</span><span>{plan.ruleset}</span></div>
         </section>
         <section className="panel compact-panel">

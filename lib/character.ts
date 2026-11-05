@@ -31,7 +31,7 @@ export type CharacterProfile = CharacterPlan & {
 export type PlanValidation = {
   valid: boolean;
   errors: Partial<
-    Record<"primaryName" | "secondaryName" | "characterClass" | "build" | "priorities", string>
+    Record<"primaryName" | "secondaryName" | "characterClass" | "priorities", string>
   >;
 };
 
@@ -54,10 +54,7 @@ export function validatePlan(plan: CharacterPlan): PlanValidation {
     errors.secondaryName = "Use 2–12 characters for the secondary name.";
   }
   if (!plan.characterClass.trim()) {
-    errors.characterClass = "Enter a class.";
-  }
-  if (!plan.build.trim()) {
-    errors.build = "Enter a build or talent focus.";
+    errors.characterClass = "Choose a class.";
   }
   if (priorityTotal(plan.priorities) !== 100) {
     errors.priorities = "Preference weights must total 100%.";

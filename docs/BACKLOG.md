@@ -23,7 +23,7 @@ Complete Phase 0 and prepare an implementation-ready handoff for the first verti
 
 | ID | Task | Status | Depends on | Acceptance evidence |
 | --- | --- | --- | --- | --- |
-| APP-001 | Initialize the Next.js TypeScript application | Tested | D-009 | Pinned install, 5 unit tests, strict typecheck, production build, rendered-page request, and health request pass |
+| APP-001 | Initialize the Next.js TypeScript application | Tested | D-009 | Pinned install, 7 unit tests, strict typecheck, production build, rendered-page request, and health request pass |
 | APP-002 | Add SQLite/Prisma persistence and migrations | Not started | APP-001, ARC-002 | Fresh migration and persistence checks pass |
 | APP-003 | Build accessible dashboard shell | Implemented | APP-001, D-009 | Responsive shell and semantic navigation are implemented; visual and interaction review remains |
 | APP-004 | Implement prototype character plans and profiles | Implemented | APP-001, D-005 | Two-part identity, preferences, browser persistence, validation, and plan-to-profile conversion are implemented; browser E2E remains |

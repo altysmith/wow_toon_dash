@@ -5,6 +5,7 @@ import {
   priorityTotal,
   type CharacterPlan,
 } from "./character";
+import { buildOptionsFor, displayBuild } from "./character-options";
 
 const plan: CharacterPlan = {
   primaryName: "Bigcrisp",
@@ -53,5 +54,18 @@ describe("character planning", () => {
         "profile-1",
       ),
     ).toThrow("invalid plan");
+  });
+
+  it("allows a beginner to create a profile without choosing a build", () => {
+    const profile = createManualProfile({ ...plan, build: "" }, "profile-1");
+
+    expect(profile.build).toBe("");
+    expect(displayBuild(profile.build)).toBe("Build undecided");
+  });
+
+  it("provides class-specific prototype build choices", () => {
+    expect(buildOptionsFor("Priest")).toContain("Shadow");
+    expect(buildOptionsFor("Mage")).toContain("Frost");
+    expect(buildOptionsFor("Unknown class")).toEqual([]);
   });
 });

@@ -26,7 +26,8 @@ npm run build
 - Starts with a draft for `Bigcrisp Lolo`.
 - Stores Forever's primary and secondary names separately.
 - Saves the plan and manual profile in browser local storage.
-- Allows region, realm, ruleset, faction, class, build, and playstyle preferences to be edited.
+- Provides class and optional class-specific build dropdowns, including a beginner-friendly “Not sure yet” choice.
+- Allows region, realm, ruleset, faction, and playstyle preferences to be edited.
 - Keeps race, talent, gear, and leveling recommendations locked until suitable Forever sources are verified.
 
 Prototype character data stays in the current browser. It does not sync between computers or call Blizzard services yet. GitHub is the source of truth for code and planning documents.

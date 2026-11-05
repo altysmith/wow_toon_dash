@@ -72,6 +72,14 @@
 - **Reason:** Development will move between computers and needs an up-to-date shared source of truth.
 - **Safety rule:** Fetch before editing, preserve local work, and never force-push over another session.
 
+### D-011 — Build and talent focus are optional at onboarding
+
+- **Status:** Confirmed
+- **Decision:** Require a class selection but allow players to choose “Not sure yet” for build or talent focus.
+- **Reason:** New and returning players may not understand talent paths when first creating a profile. The dashboard should help them learn rather than require a premature choice.
+- **Prototype behavior:** Class and build use dropdowns; changing class clears an incompatible build.
+- **Data note:** Prototype class and talent labels remain excluded from recommendations until Forever availability and terminology are verified.
+
 ## Open decisions
 
 ### Q-001 — Access model for local development
