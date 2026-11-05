@@ -88,6 +88,15 @@
 - **Design boundary:** Use original AltyLab styling and honest empty states. Do not copy Blizzard artwork, logos, item art, or character renders.
 - **Prototype behavior:** Unknown equipment remains visibly empty, and unavailable character art uses a labeled placeholder rather than fabricated imagery.
 
+### D-013 — Validate public lookup before account OAuth
+
+- **Status:** Confirmed for prototype
+- **Decision:** Prove an official Blizzard public character lookup using region, realm, and primary character name before adding Battle.net account authorization.
+- **Reason:** This validates credentials, endpoint behavior, and Forever coverage with a smaller security boundary.
+- **Credential boundary:** The client secret is read only by server routes from environment variables. The browser receives normalized character fields and safe errors, never the secret or access token.
+- **Profile boundary:** Lookup results remain a preview and do not overwrite the manually maintained profile.
+- **Prohibited inputs:** The app must never request a Battle.net password or browser cookies.
+
 ## Open decisions
 
 ### Q-001 — Access model for local development
