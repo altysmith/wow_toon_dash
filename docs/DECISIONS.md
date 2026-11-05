@@ -91,11 +91,18 @@
 ### D-013 — Verify a WoW Forever source before any sync
 
 - **Status:** Confirmed for prototype
-- **Decision:** Verify an authorized WoW Forever data source before adding any live synchronization or account connection.
+- **Decision:** Verify an authorized WoW Forever data source before importing or synchronizing character data.
 - **Reason:** Forever servers and character data may differ from Blizzard Retail, Classic, and Worldsoul services. A familiar Blizzard endpoint is not evidence of Forever compatibility.
-- **Profile boundary:** Imported data remains a preview until its Forever source and field coverage are documented.
+- **Profile boundary:** Battle.net OAuth may confirm account identity, but imported character data remains disabled until its Forever source and field coverage are documented.
 - **Current behavior:** The dashboard stays manual and records Forever region and ruleset; it does not ask for a realm name.
 - **Prohibited assumptions:** Retail realm names, region rules, Armory fields, and standard Blizzard account APIs cannot be used as Forever evidence.
+
+### D-014 — Battle.net OAuth confirms identity only
+
+- **Status:** Confirmed for prototype
+- **Decision:** Allow Battle.net account authorization with `wow.profile` scope to confirm account identity, while keeping character discovery disabled until the Forever profile namespace and coverage are verified.
+- **Credential handling:** Exchange the authorization code server-side, use the access token only for `/userinfo`, then discard it. Store only account ID, BattleTag when present, and connection time in an authenticated encrypted HttpOnly cookie for the local prototype.
+- **Boundary:** OAuth success does not mean Forever character sync is supported and does not overwrite the manual character profile.
 
 ## Open decisions
 

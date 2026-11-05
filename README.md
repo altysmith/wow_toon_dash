@@ -17,6 +17,8 @@ Open `http://localhost:3000`.
 
 The prototype is scoped to World of Warcraft: Forever. Its servers and data sources are treated as Forever-specific. The standard Blizzard Retail, Classic, or Worldsoul Armory is not assumed to represent Forever characters.
 
+Battle.net account connection is available when OAuth credentials and a registered callback are configured. It confirms account identity only; Forever character discovery remains unverified. See [Battle.net OAuth setup](docs/BATTLENET_OAUTH.md).
+
 ## Checks
 
 ```bash

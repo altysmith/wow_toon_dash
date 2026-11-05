@@ -54,6 +54,15 @@ export function CompanionDashboard() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    if (query.get("view") === "sync") setView("sync");
+    const connectionResult = query.get("bnet");
+    if (connectionResult === "connected") setNotice("Battle.net account connected. WoW Forever character discovery is still unverified.");
+    if (connectionResult === "disconnected") setNotice("Battle.net account disconnected.");
+    if (connectionResult === "failed") setNotice("Battle.net connection failed or was canceled.");
+    if (connectionResult === "not-configured") setNotice("Battle.net OAuth needs developer credentials and a registered callback URL.");
+    if (connectionResult) window.history.replaceState({}, "", window.location.pathname);
+
     const stored = window.localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
@@ -502,9 +511,9 @@ function BlizzardSync({ plan }: { plan: CharacterPlan }) {
     <div className="sync-layout">
       <section className="panel sync-intro">
         <p className="eyebrow">WoW Forever only</p>
-        <h2>Server data research</h2>
-        <p>This dashboard is scoped to World of Warcraft: Forever. Its servers, naming rules, game data, and available integrations must be researched as Forever-specific sources.</p>
-        <div className="sync-state sync-warning">Live lookup is paused until a Forever-compatible API, addon export, or server data source is verified.</div>
+        <h2>Battle.net account</h2>
+        <p>Connect securely through Blizzard to confirm your Battle.net account. This connection does not guarantee that Forever characters are available through Blizzard’s profile API.</p>
+        <BattleNetConnection />
         <article className="sync-result">
           <p className="eyebrow">Current manual identity</p>
           <h3>{fullCharacterName(plan)}</h3>
@@ -534,6 +543,37 @@ function BlizzardSync({ plan }: { plan: CharacterPlan }) {
           <p>Any future sync adapter must name its Forever source and document its coverage before it can update a character profile.</p>
         </section>
       </aside>
+    </div>
+  );
+}
+
+type BattleNetStatus = {
+  configured: boolean;
+  account: { id: string; battleTag: string | null; connectedAt: string } | null;
+  foreverCharacterDiscovery: "unverified";
+};
+
+function BattleNetConnection() {
+  const [status, setStatus] = useState<BattleNetStatus | null>(null);
+  useEffect(() => {
+    fetch("/api/battlenet/status")
+      .then((response) => response.json() as Promise<BattleNetStatus>)
+      .then(setStatus)
+      .catch(() => setStatus({ configured: false, account: null, foreverCharacterDiscovery: "unverified" }));
+  }, []);
+
+  if (!status) return <div className="sync-state">Checking Battle.net connection…</div>;
+  if (!status.configured) {
+    return <div className="sync-state sync-warning">OAuth setup is incomplete. Add the client ID, client secret, callback URL, and app session secret to the local environment.</div>;
+  }
+  if (!status.account) {
+    return <div className="bnet-connect"><div className="sync-state sync-warning">Not connected. Blizzard will ask you to approve the WoW profile permission.</div><a className="primary-button" href="/api/battlenet/connect">Connect Battle.net</a></div>;
+  }
+  return (
+    <div className="bnet-connect">
+      <div className="sync-state">Connected{status.account.battleTag ? ` as ${status.account.battleTag}` : " to your Battle.net account"}.</div>
+      <p className="result-note">Forever character discovery is still unverified. No character data has been imported.</p>
+      <form action="/api/battlenet/disconnect" method="post"><button className="secondary-button" type="submit">Disconnect Battle.net</button></form>
     </div>
   );
 }
