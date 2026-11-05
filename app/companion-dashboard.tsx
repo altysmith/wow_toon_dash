@@ -588,18 +588,23 @@ type CharacterProbeResult = {
   result: string;
   message?: string;
   note?: string;
-  characters?: Array<{
-    id: number | null;
-    primaryName: string;
-    secondaryName: null;
-    level: number | null;
-    region: string;
-    realm: string | null;
-    characterClass: string | null;
-    race: string | null;
-    foreverCompatibility: "unverified";
-  }>;
+  characters?: CharacterProbeCharacter[];
 };
+
+type CharacterProbeCharacter = {
+  id: number | null;
+  primaryName: string;
+  secondaryName: null;
+  level: number | null;
+  region: string;
+  realm: string | null;
+  realmSlug: string | null;
+  characterClass: string | null;
+  race: string | null;
+  foreverCompatibility: "unverified";
+};
+
+type CharacterMediaResult = { imageUrl?: string; assetKey?: string; message?: string };
 
 type GameProfile = "" | "retail" | "classic-era" | "forever";
 
@@ -615,6 +620,10 @@ function BattleNetConnection({ region: initialRegion }: { region: string }) {
   const [gameProfile, setGameProfile] = useState<GameProfile>("");
   const [namespace, setNamespace] = useState("");
   const [probe, setProbe] = useState<CharacterProbeResult | null>(null);
+  const [mediaCharacter, setMediaCharacter] = useState<CharacterProbeCharacter | null>(null);
+  const [mediaUrl, setMediaUrl] = useState("");
+  const [mediaMessage, setMediaMessage] = useState("");
+  const [loadingMedia, setLoadingMedia] = useState(false);
   const [probing, setProbing] = useState(false);
   const [probeMessage, setProbeMessage] = useState("");
   useEffect(() => {
@@ -635,6 +644,9 @@ function BattleNetConnection({ region: initialRegion }: { region: string }) {
   async function probeNamespace(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setProbe(null);
+    setMediaCharacter(null);
+    setMediaUrl("");
+    setMediaMessage("");
     setProbing(true);
     setProbeMessage("Checking this namespace against your Battle.net account…");
     try {
@@ -651,6 +663,25 @@ function BattleNetConnection({ region: initialRegion }: { region: string }) {
       setProbeMessage("Could not reach Blizzard's profile API.");
     } finally {
       setProbing(false);
+    }
+  }
+
+  async function loadCharacterAppearance(character: CharacterProbeCharacter) {
+    setMediaCharacter(character);
+    setMediaUrl("");
+    setLoadingMedia(true);
+    setMediaMessage("Loading this Retail character's appearance from Blizzard…");
+    try {
+      const query = new URLSearchParams({ region: character.region, namespace, realm: character.realmSlug ?? "", name: character.primaryName });
+      const response = await fetch(`/api/battlenet/character-media?${query}`);
+      const body = (await response.json()) as CharacterMediaResult;
+      if (!response.ok || !body.imageUrl) throw new Error(body.message || "Blizzard did not return an appearance image.");
+      setMediaUrl(body.imageUrl);
+      setMediaMessage("");
+    } catch (error) {
+      setMediaMessage(error instanceof Error ? error.message : "Could not load the character appearance.");
+    } finally {
+      setLoadingMedia(false);
     }
   }
 
@@ -698,11 +729,22 @@ function BattleNetConnection({ region: initialRegion }: { region: string }) {
       </form>
       {probe?.characters && probe.characters.length > 0 && (
         <article className="sync-result">
-          <p className="eyebrow">Character list preview · Forever compatibility unverified</p>
-          <dl>{probe.characters.map((character, index) => <div key={`${character.id ?? character.primaryName}-${index}`}>
-            <dt>{character.primaryName} · {character.secondaryName ?? "Secondary name unavailable"}</dt>
-            <dd>{[character.characterClass, character.race, character.level ? `Level ${character.level}` : null, character.realm].filter(Boolean).join(" · ") || "Partial response"}</dd>
-          </div>)}</dl>
+          <p className="eyebrow">Retail character list · Forever compatibility unverified</p>
+          <div className="character-list-grid">{probe.characters.map((character, index) => <button className="character-list-card" key={`${character.id ?? character.primaryName}-${index}`} onClick={() => void loadCharacterAppearance(character)} type="button">
+            <strong>{character.primaryName}</strong>
+            <span>{[character.characterClass, character.race, character.level ? `Level ${character.level}` : null, character.realm].filter(Boolean).join(" · ") || "Partial response"}</span>
+            <small>Preview appearance</small>
+          </button>)}</div>
+          {mediaCharacter && <div className="character-appearance-preview" aria-live="polite">
+            <div className="character-appearance-image">
+              {mediaUrl ? <img src={mediaUrl} alt={`${mediaCharacter.primaryName} Retail character appearance`} /> : <span>{loadingMedia ? "Loading…" : "Preview unavailable"}</span>}
+            </div>
+            <div><p className="eyebrow">Retail appearance preview</p><h3>{mediaCharacter.primaryName}</h3>
+              <p>{[mediaCharacter.characterClass, mediaCharacter.race, mediaCharacter.level ? `Level ${mediaCharacter.level}` : null, mediaCharacter.realm].filter(Boolean).join(" · ")}</p>
+              <p className="result-note">This image comes from Blizzard&apos;s Retail character-media API. It is for layout testing and does not indicate WoW Forever support.</p>
+              {mediaMessage && <p className="namespace-note" role="status">{mediaMessage}</p>}
+            </div>
+          </div>}
           <p className="result-note">{probe.note}</p>
         </article>
       )}

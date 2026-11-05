@@ -163,6 +163,18 @@ main { width: 100%; max-width: 1500px; padding: 30px clamp(20px, 4vw, 64px) 24px
 .sync-result dl div { padding: 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
 .sync-result dt { color: var(--muted); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
 .sync-result dd { margin: 4px 0 0; color: #f0d495; font-weight: 700; }
+.character-list-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin: 18px 0; }
+.character-list-card { display: grid; gap: 6px; padding: 13px; text-align: left; color: var(--text); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+.character-list-card:hover, .character-list-card:focus-visible { border-color: var(--gold); outline: none; }
+.character-list-card strong { color: #f0d495; }
+.character-list-card span { color: var(--muted); font-size: 12px; }
+.character-list-card small { color: var(--gold); font-size: 11px; }
+.character-appearance-preview { display: grid; grid-template-columns: minmax(180px, 300px) 1fr; gap: 20px; align-items: center; margin: 18px 0; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: #0b0c11; }
+.character-appearance-image { display: grid; place-items: center; min-height: 250px; overflow: hidden; border-radius: 8px; background: radial-gradient(circle, rgba(132,103,215,.25), transparent 68%); }
+.character-appearance-image img { display: block; max-width: 100%; max-height: 330px; object-fit: contain; }
+.character-appearance-image span { color: var(--muted); font-size: 13px; }
+.character-appearance-preview h3 { margin: 4px 0 8px; }
+.character-appearance-preview p:not(.eyebrow) { color: var(--muted); font-size: 13px; line-height: 1.5; }
 .result-note { margin: 0; color: var(--warning); font-size: 12px; }
 .bnet-connect { display: grid; justify-items: start; gap: 12px; }
 .bnet-connect .sync-state { width: 100%; margin: 12px 0 4px; }
@@ -207,6 +219,7 @@ main { width: 100%; max-width: 1500px; padding: 30px clamp(20px, 4vw, 64px) 24px
   .sync-form .primary-button { grid-column: auto; }
   .namespace-fields { grid-template-columns: 1fr; }
   .namespace-fields .primary-button { grid-column: auto; }
+  .character-appearance-preview { grid-template-columns: 1fr; }
   .character-preview { grid-column: auto; }
   .character-sheet-header { grid-template-columns: auto 1fr; padding: 20px; }
   .sheet-edit-button { grid-column: 1 / -1; width: 100%; }
