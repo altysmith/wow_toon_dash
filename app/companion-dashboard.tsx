@@ -513,7 +513,7 @@ function BlizzardSync({ plan }: { plan: CharacterPlan }) {
         <p className="eyebrow">WoW Forever only</p>
         <h2>Battle.net account</h2>
         <p>Connect securely through Blizzard to confirm your Battle.net account. This connection does not guarantee that Forever characters are available through Blizzard’s profile API.</p>
-        <BattleNetConnection />
+        <BattleNetConnection region={plan.region.toLowerCase()} />
         <article className="sync-result">
           <p className="eyebrow">Current manual identity</p>
           <h3>{fullCharacterName(plan)}</h3>
@@ -553,8 +553,30 @@ type BattleNetStatus = {
   foreverCharacterDiscovery: "unverified";
 };
 
-function BattleNetConnection() {
+type CharacterProbeResult = {
+  result: string;
+  message?: string;
+  note?: string;
+  characters?: Array<{
+    id: number | null;
+    primaryName: string;
+    secondaryName: null;
+    level: number | null;
+    region: string;
+    realm: string | null;
+    characterClass: string | null;
+    race: string | null;
+    foreverCompatibility: "unverified";
+  }>;
+};
+
+function BattleNetConnection({ region: initialRegion }: { region: string }) {
   const [status, setStatus] = useState<BattleNetStatus | null>(null);
+  const [region, setRegion] = useState(initialRegion);
+  const [namespace, setNamespace] = useState("");
+  const [probe, setProbe] = useState<CharacterProbeResult | null>(null);
+  const [probing, setProbing] = useState(false);
+  const [probeMessage, setProbeMessage] = useState("");
   useEffect(() => {
     fetch("/api/battlenet/status")
       .then((response) => response.json() as Promise<BattleNetStatus>)
@@ -569,10 +591,59 @@ function BattleNetConnection() {
   if (!status.account) {
     return <div className="bnet-connect"><div className="sync-state sync-warning">Not connected. Blizzard will ask you to approve the WoW profile permission.</div><a className="primary-button" href="/api/battlenet/connect">Connect Battle.net</a></div>;
   }
+
+  async function probeNamespace(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setProbe(null);
+    setProbing(true);
+    setProbeMessage("Checking this namespace against your Battle.net account…");
+    try {
+      const query = new URLSearchParams({ region, namespace });
+      const response = await fetch(`/api/battlenet/characters?${query}`);
+      const body = (await response.json()) as CharacterProbeResult;
+      if (response.ok) {
+        setProbe(body);
+        setProbeMessage(body.characters?.length ? `Blizzard returned ${body.characters.length} character(s).` : "Blizzard accepted the namespace and returned no characters.");
+      } else {
+        setProbeMessage(body.message || "The namespace request failed.");
+      }
+    } catch {
+      setProbeMessage("Could not reach Blizzard's profile API.");
+    } finally {
+      setProbing(false);
+    }
+  }
+
   return (
     <div className="bnet-connect">
       <div className="sync-state">Connected{status.account.battleTag ? ` as ${status.account.battleTag}` : " to your Battle.net account"}.</div>
-      <p className="result-note">Forever character discovery is still unverified. No character data has been imported.</p>
+      <p className="result-note">The account connection is confirmed. Character discovery is experimental until a WoW Forever namespace is verified.</p>
+      <form className="namespace-probe" onSubmit={probeNamespace}>
+        <p className="eyebrow">Try an explicit namespace</p>
+        <p>Enter a candidate from a Forever-specific source. We will query Blizzard&apos;s account character list and show a preview only. A 404 cannot tell us whether the namespace is wrong or the account has no characters there.</p>
+        <div className="namespace-fields">
+          <Field label="Region">
+            <select value={region} onChange={(event) => setRegion(event.target.value)}>
+              <option value="us">Americas / Oceania</option><option value="eu">Europe</option><option value="kr">Korea</option><option value="tw">Taiwan</option>
+            </select>
+          </Field>
+          <Field label="Namespace" hint="No default is assumed">
+            <input required value={namespace} onChange={(event) => setNamespace(event.target.value)} placeholder="Enter a sourced candidate" />
+          </Field>
+          <button className="primary-button" disabled={probing || !namespace.trim()} type="submit">{probing ? "Checking…" : "Check namespace"}</button>
+        </div>
+        {probeMessage && <div className="sync-state sync-warning" role="status">{probeMessage}</div>}
+      </form>
+      {probe?.characters && probe.characters.length > 0 && (
+        <article className="sync-result">
+          <p className="eyebrow">Character list preview · Forever compatibility unverified</p>
+          <dl>{probe.characters.map((character, index) => <div key={`${character.id ?? character.primaryName}-${index}`}>
+            <dt>{character.primaryName} · {character.secondaryName ?? "Secondary name unavailable"}</dt>
+            <dd>{[character.characterClass, character.race, character.level ? `Level ${character.level}` : null, character.realm].filter(Boolean).join(" · ") || "Partial response"}</dd>
+          </div>)}</dl>
+          <p className="result-note">{probe.note}</p>
+        </article>
+      )}
       <form action="/api/battlenet/disconnect" method="post"><button className="secondary-button" type="submit">Disconnect Battle.net</button></form>
     </div>
   );

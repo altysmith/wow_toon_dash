@@ -100,9 +100,10 @@
 ### D-014 — Battle.net OAuth confirms identity only
 
 - **Status:** Confirmed for prototype
-- **Decision:** Allow Battle.net account authorization with `wow.profile` scope to confirm account identity, while keeping character discovery disabled until the Forever profile namespace and coverage are verified.
-- **Credential handling:** Exchange the authorization code server-side, use the access token only for `/userinfo`, then discard it. Store only account ID, BattleTag when present, and connection time in an authenticated encrypted HttpOnly cookie for the local prototype.
+- **Decision:** Allow Battle.net account authorization with `wow.profile` scope to confirm account identity and probe an explicitly supplied namespace, while keeping character import disabled until Forever coverage is verified.
+- **Credential handling:** Exchange the authorization code server-side and keep the short-lived access token only in an authenticated encrypted HttpOnly cookie, capped at the token's expiry or 24 hours, for the explicit namespace probe. The status route never returns the token; no refresh token is stored.
 - **Boundary:** OAuth success does not mean Forever character sync is supported and does not overwrite the manual character profile.
+- **Probe behavior:** The user must supply the region and namespace. A returned list is an unverified preview. A 404 remains ambiguous between no characters and an unsupported namespace.
 
 ## Open decisions
 

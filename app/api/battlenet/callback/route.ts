@@ -9,7 +9,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-type TokenResponse = { access_token?: string };
+type TokenResponse = { access_token?: string; expires_in?: number };
 type UserInfoResponse = { id?: number | string; battletag?: string };
 
 export async function GET(request: Request) {
@@ -49,6 +49,8 @@ export async function GET(request: Request) {
       id: String(user.id),
       battleTag: typeof user.battletag === "string" ? user.battletag : null,
       connectedAt: new Date().toISOString(),
+      accessToken: tokenData.access_token,
+      tokenExpiresAt: Math.floor(Date.now() / 1000) + (tokenData.expires_in ?? 86_400),
     };
     return finish(request, "connected", sessionCookie(account, config.sessionSecret));
   } catch {

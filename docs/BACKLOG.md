@@ -29,7 +29,8 @@ Complete Phase 0 and prepare an implementation-ready handoff for the first verti
 | APP-004 | Implement prototype character plans and profiles | Implemented | APP-001, D-005 | Two-part identity, preferences, browser persistence, validation, and plan-to-profile conversion are implemented; browser E2E remains |
 | SYNC-001 | Keep the Blizzard adapter isolated as comparison code | Implemented | APP-001, D-013 | Adapter tests pass, but the UI does not treat Blizzard Retail data as WoW Forever data |
 | SYNC-002 | Identify an authorized WoW Forever character source | Blocked | RES-001, RES-002, D-013 | Source documents region/ruleset identity, two-part names, field coverage, access rules, and licensing |
-| AUTH-001 | Connect Battle.net account with OAuth | Implemented | APP-001 | State-checked OAuth callback confirms `/userinfo`; access token is discarded; only encrypted account identity cookie is kept. Live connection awaits app credentials and registered callback URL |
+| AUTH-001 | Connect Battle.net account with OAuth | Implemented | APP-001 | State-checked OAuth callback confirms `/userinfo`; short-lived access token is stored only in the encrypted HttpOnly cookie required for the explicit character-list probe |
+| AUTH-002 | Probe account character list with explicit Forever namespace | Implemented | AUTH-001, SYNC-002 | Short-lived token is used server-side to query `/profile/user/wow`; user supplies region/namespace; results are preview only and 404 ambiguity is shown |
 | DATA-001 | Import verified race/class and racial data | Not started | RES-003, APP-002 | Each record has version and source; fixture validation passes |
 | OPT-001 | Implement deterministic race comparison | Not started | DATA-001, APP-004 | Weighting, eligibility, explanations, and reproducibility tests pass |
 | E2E-001 | Verify the primary Priest scenario | Not started | OPT-001 | End-to-end flow completes with sourced data and saved plan |

@@ -3,12 +3,14 @@ import { createCipheriv, createDecipheriv, randomBytes, scryptSync, timingSafeEq
 const STATE_COOKIE = "altylab_bnet_state";
 const SESSION_COOKIE = "altylab_bnet_session";
 const STATE_TTL_SECONDS = 600;
-const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
+const MAX_SESSION_TTL_SECONDS = 60 * 60 * 24;
 
 export type BattleNetAccount = {
   id: string;
   battleTag: string | null;
   connectedAt: string;
+  accessToken: string;
+  tokenExpiresAt: number;
 };
 
 export function getBattleNetConfig(environment: NodeJS.ProcessEnv = process.env) {
@@ -46,7 +48,8 @@ export function sessionCookie(account: BattleNetAccount, secret: string) {
   const cipher = createCipheriv("aes-256-gcm", sessionKey(secret), iv);
   const encrypted = Buffer.concat([cipher.update(JSON.stringify(account), "utf8"), cipher.final()]);
   const value = [iv, cipher.getAuthTag(), encrypted].map((part) => part.toString("base64url")).join(".");
-  return cookie(SESSION_COOKIE, value, SESSION_TTL_SECONDS);
+  const remainingSeconds = Math.max(0, Math.floor(account.tokenExpiresAt - Date.now() / 1000));
+  return cookie(SESSION_COOKIE, value, Math.min(MAX_SESSION_TTL_SECONDS, remainingSeconds));
 }
 
 export function readBattleNetSession(request: Request, secret: string): BattleNetAccount | null {
@@ -62,7 +65,13 @@ export function readBattleNetSession(request: Request, secret: string): BattleNe
       decipher.final(),
     ]).toString("utf8");
     const account = JSON.parse(plaintext) as BattleNetAccount;
-    if (typeof account.id !== "string" || typeof account.connectedAt !== "string") return null;
+    if (
+      typeof account.id !== "string" ||
+      typeof account.connectedAt !== "string" ||
+      typeof account.accessToken !== "string" ||
+      typeof account.tokenExpiresAt !== "number" ||
+      account.tokenExpiresAt <= Date.now() / 1000
+    ) return null;
     return account;
   } catch {
     return null;
@@ -87,7 +96,12 @@ function sessionKey(secret: string) {
 function readCookie(request: Request, name: string) {
   const cookies = request.headers.get("cookie") ?? "";
   const entry = cookies.split(";").map((part) => part.trim()).find((part) => part.startsWith(`${name}=`));
-  return entry ? decodeURIComponent(entry.slice(name.length + 1)) : null;
+  if (!entry) return null;
+  try {
+    return decodeURIComponent(entry.slice(name.length + 1));
+  } catch {
+    return null;
+  }
 }
 
 function cookie(name: string, value: string, maxAge: number) {

@@ -165,6 +165,10 @@ main { width: 100%; max-width: 1500px; padding: 30px clamp(20px, 4vw, 64px) 24px
 .bnet-connect .sync-state { width: 100%; margin: 12px 0 4px; }
 .bnet-connect a.primary-button { display: inline-flex; align-items: center; text-decoration: none; }
 .bnet-connect form { margin: 0; }
+.namespace-probe { width: 100%; margin: 14px 0; padding-top: 16px; border-top: 1px solid var(--line); }
+.namespace-probe > p:not(.eyebrow) { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.namespace-fields { display: grid; grid-template-columns: .8fr 1.2fr auto; align-items: end; gap: 12px; }
+.namespace-fields .primary-button { white-space: nowrap; }
 
 @media (max-width: 1100px) {
   .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -180,6 +184,8 @@ main { width: 100%; max-width: 1500px; padding: 30px clamp(20px, 4vw, 64px) 24px
   .sync-side { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .sync-form { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .sync-form .primary-button { grid-column: 1 / -1; }
+  .namespace-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .namespace-fields .primary-button { grid-column: 1 / -1; }
 }
 
 @media (max-width: 760px) {
@@ -194,6 +200,8 @@ main { width: 100%; max-width: 1500px; padding: 30px clamp(20px, 4vw, 64px) 24px
   .hero-card { align-items: flex-start; flex-direction: column; min-height: 220px; }
   .summary-grid, .two-column, .field-grid, .preview-column, .sync-side, .sync-form, .sync-result dl { grid-template-columns: 1fr; }
   .sync-form .primary-button { grid-column: auto; }
+  .namespace-fields { grid-template-columns: 1fr; }
+  .namespace-fields .primary-button { grid-column: auto; }
   .character-preview { grid-column: auto; }
   .character-sheet-header { grid-template-columns: auto 1fr; padding: 20px; }
   .sheet-edit-button { grid-column: 1 / -1; width: 100%; }
